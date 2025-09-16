@@ -1,0 +1,171 @@
+﻿namespace WindowsFormsApp1
+{
+    partial class CreateTicketForm
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.btnCreate = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.txt_device_code = new System.Windows.Forms.TextBox();
+            this.txt_decristion = new System.Windows.Forms.TextBox();
+            this.txt_employee_code = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.SuspendLayout();
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.ForeColor = System.Drawing.Color.Red;
+            this.label5.Location = new System.Drawing.Point(327, 213);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(17, 13);
+            this.label5.TabIndex = 31;
+            this.label5.Text = "(*)";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.ForeColor = System.Drawing.Color.Red;
+            this.label6.Location = new System.Drawing.Point(327, 180);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(17, 13);
+            this.label6.TabIndex = 30;
+            this.label6.Text = "(*)";
+            // 
+            // btnCreate
+            // 
+            this.btnCreate.Location = new System.Drawing.Point(470, 298);
+            this.btnCreate.Name = "btnCreate";
+            this.btnCreate.Size = new System.Drawing.Size(75, 23);
+            this.btnCreate.TabIndex = 29;
+            this.btnCreate.Text = "Tạo";
+            this.btnCreate.UseVisualStyleBackColor = true;
+            this.btnCreate.Click += new System.EventHandler(this.btnCreate_Click);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(256, 256);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(81, 13);
+            this.label7.TabIndex = 28;
+            this.label7.Text = "Mô tả tình trạng";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(256, 213);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(72, 13);
+            this.label8.TabIndex = 27;
+            this.label8.Text = "Mã nhân viên";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(272, 180);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(56, 13);
+            this.label9.TabIndex = 26;
+            this.label9.Text = "Mã thiết bị";
+            // 
+            // txt_device_code
+            // 
+            this.txt_device_code.Location = new System.Drawing.Point(350, 177);
+            this.txt_device_code.Name = "txt_device_code";
+            this.txt_device_code.Size = new System.Drawing.Size(121, 20);
+            this.txt_device_code.TabIndex = 25;
+            this.txt_device_code.Enter += new System.EventHandler(this.txt_device_code_Enter);
+            this.txt_device_code.Leave += new System.EventHandler(this.txt_device_code_Leave);
+            // 
+            // txt_decristion
+            // 
+            this.txt_decristion.Location = new System.Drawing.Point(350, 253);
+            this.txt_decristion.Name = "txt_decristion";
+            this.txt_decristion.Size = new System.Drawing.Size(178, 20);
+            this.txt_decristion.TabIndex = 24;
+            // 
+            // txt_employee_code
+            // 
+            this.txt_employee_code.Location = new System.Drawing.Point(350, 213);
+            this.txt_employee_code.Name = "txt_employee_code";
+            this.txt_employee_code.Size = new System.Drawing.Size(121, 20);
+            this.txt_employee_code.TabIndex = 23;
+            this.txt_employee_code.Enter += new System.EventHandler(this.txt_employee_code_Enter);
+            this.txt_employee_code.Leave += new System.EventHandler(this.txt_employee_code_Leave);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label4.Location = new System.Drawing.Point(311, 129);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(234, 25);
+            this.label4.TabIndex = 22;
+            this.label4.Text = "Tạo thiết bị sửa chữa";
+            // 
+            // CreateTicketForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.btnCreate);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.txt_device_code);
+            this.Controls.Add(this.txt_decristion);
+            this.Controls.Add(this.txt_employee_code);
+            this.Controls.Add(this.label4);
+            this.Name = "CreateTicketForm";
+            this.Text = "CreateTicketForm";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button btnCreate;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox txt_device_code;
+        private System.Windows.Forms.TextBox txt_decristion;
+        private System.Windows.Forms.TextBox txt_employee_code;
+        private System.Windows.Forms.Label label4;
+    }
+}

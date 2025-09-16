@@ -462,7 +462,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void btn_Accept_Click(object sender, EventArgs e)
+        private void btn_Delete_Click(object sender, EventArgs e)
         {
             if (listview_all_ticket.SelectedItems.Count == 0)
             {
@@ -520,5 +520,19 @@ namespace WindowsFormsApp1
         {
             this.Close();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            using (CreateTicketForm nextForm = new CreateTicketForm())
+            {
+                var result = nextForm.ShowDialog();
+
+                if (result == DialogResult.OK) 
+                {
+                    RefreshTickets();
+                }
+            }
+        }
+
     }
 }

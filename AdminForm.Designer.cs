@@ -57,6 +57,7 @@
             this.rtb_history = new System.Windows.Forms.RichTextBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.btn_create_ticket = new System.Windows.Forms.Button();
             this.tab_controller.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -80,6 +81,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btn_create_ticket);
             this.tabPage1.Controls.Add(this.btnSearch);
             this.tabPage1.Controls.Add(this.txtSearch);
             this.tabPage1.Controls.Add(this.btnCancel);
@@ -117,7 +119,7 @@
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(105, 23);
             this.btnCancel.TabIndex = 2;
-            this.btnCancel.Text = "Hủy";
+            this.btnCancel.Text = "Đóng";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
@@ -129,7 +131,7 @@
             this.btn_Accept.TabIndex = 1;
             this.btn_Accept.Text = "Xóa ticket";
             this.btn_Accept.UseVisualStyleBackColor = true;
-            this.btn_Accept.Click += new System.EventHandler(this.btn_Accept_Click);
+            this.btn_Accept.Click += new System.EventHandler(this.btn_Delete_Click);
             // 
             // listview_all_ticket
             // 
@@ -339,6 +341,16 @@
             this.contextMenuStrip2.Name = "contextMenuStrip2";
             this.contextMenuStrip2.Size = new System.Drawing.Size(61, 4);
             // 
+            // btn_create_ticket
+            // 
+            this.btn_create_ticket.Location = new System.Drawing.Point(43, 15);
+            this.btn_create_ticket.Name = "btn_create_ticket";
+            this.btn_create_ticket.Size = new System.Drawing.Size(105, 23);
+            this.btn_create_ticket.TabIndex = 5;
+            this.btn_create_ticket.Text = "Tạo ticket";
+            this.btn_create_ticket.UseVisualStyleBackColor = true;
+            this.btn_create_ticket.Click += new System.EventHandler(this.button1_Click);
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -390,6 +402,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.RichTextBox rtb_history;
-
+        private System.Windows.Forms.Button btn_create_ticket;
     }
 }
