@@ -16,6 +16,5 @@ namespace WindowsFormsApp1.Dtos
         public String OldValue { get; set; }
         public String NewValue { get; set; }
         public bool IsCreator { get; set; }
-
     }
 }
