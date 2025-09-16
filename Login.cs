@@ -28,6 +28,11 @@ namespace WindowsFormsApp1
 
             txt_employee_code.Text = "Nhập EmployeeID...";
             txt_employee_code.ForeColor = Color.Gray;
+            this.ActiveControl = txt_device_code;
+            txt_device_code.TabIndex = 0;
+            txt_employee_code.TabIndex = 1;
+            txt_decristion.TabIndex = 2;
+            btnCreate.TabIndex = 3;
         }
 
         private void btn_login(object sender, EventArgs e)

@@ -32,3 +32,4 @@ C:\Users\Sumi\source\repos\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\System.Th
 C:\Users\Sumi\source\repos\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\System.ValueTuple.xml
 C:\Users\Sumi\source\repos\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\ManagerD.A2123168.Up2Date
 C:\Users\Sumi\source\repos\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.ItForm.resources
+C:\Users\Sumi\source\repos\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.CreateTicketForm.resources

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -14,6 +15,9 @@ namespace WindowsFormsApp1
 {
     public partial class AdminForm : Form
     {
+        private string currentSearchKeyword = "";
+        private int sortColumn = -1;
+        private bool ascending = true;
         private TicketController ticketController;
         private UserController userController;
         private DeviceController deviceController;
@@ -56,6 +60,7 @@ namespace WindowsFormsApp1
             listview_all_ticket.FullRowSelect = true;
             listview_all_ticket.GridLines = true;
             listview_all_ticket.MouseDoubleClick += Listview_all_ticket_DoubleClick;
+            listview_all_ticket.ColumnClick += Listview_all_ticket_ColumnClick;
 
             // User 
             listview_user.View = View.Details;
@@ -96,14 +101,19 @@ namespace WindowsFormsApp1
             LoadHistory();
         }
 
-        private void RefreshTickets()
+        private void RefreshTickets(string keyword = "")
         {
+            var tickets = ticketController.SearchTickets(keyword); // search tất cả field
             listview_all_ticket.Items.Clear();
             listview_all_ticket.Items.AddRange(
-                ticketController.GetAllTickets()
-                                .Select(t => t.ToListViewItem())
-                                .ToArray()
+                tickets.Select(t => t.ToListViewItem()).ToArray()
             );
+
+            if (sortColumn >= 0)
+            {
+                listview_all_ticket.ListViewItemSorter = new ListViewTicketComparer(sortColumn, ascending, ticketController.columnMap);
+                listview_all_ticket.Sort();
+            }
         }
 
         private void LoadUsers()
@@ -118,17 +128,44 @@ namespace WindowsFormsApp1
         private void LoadHistory()
         {
             var historyList = historyController.GetAllHistory();
+
+            // Sort giảm dần theo ChangeDate
+            historyList = historyList
+                .OrderByDescending(h => DateTime.TryParse(h.ChangeDate, out DateTime dt) ? dt : DateTime.MinValue)
+                .ToList();
+
             rtb_history.Clear();
-            foreach (var h in historyList)
+
+            // Nhóm theo ngày
+            var grouped = historyList.GroupBy(h =>
+                DateTime.TryParse(h.ChangeDate, out DateTime dt) ? dt.Date : DateTime.MinValue.Date
+            );
+
+            foreach (var group in grouped)
             {
-                string line = $"[{h.ChangeDate}] {h.ChangedBy} thay đổi \"{h.FieldChanged}\" từ \"{h.OldValue}\" → \"{h.NewValue}\"";
-                if (h.IsCreator)
+                string dayLabel = group.Key == DateTime.Today ? "Hôm nay" : group.Key.ToString("dd/MM/yyyy");
+                rtb_history.AppendText($"- {dayLabel}{Environment.NewLine}");
+
+                foreach (var h in group)
                 {
-                    line = $"[{h.ChangeDate}] {h.ChangedBy} tạo ticket mới";
+                    DateTime dt = DateTime.TryParse(h.ChangeDate, out DateTime t) ? t : DateTime.MinValue;
+                    string timePart = dt.ToString("dd/MM/yyyy HH:mm");
+                    string line;
+
+                    if (h.IsCreator)
+                    {
+                        line = $"[{timePart}] {h.ChangedBy} tạo ticket mới";
+                    }
+                    else
+                    {
+                        line = $"[{timePart}] {h.ChangedBy} thay đổi \"{h.FieldChanged}\" từ \"{h.OldValue}\" → \"{h.NewValue}\"";
+                    }
+
+                    rtb_history.AppendText("  " + line + Environment.NewLine);
                 }
-                rtb_history.AppendText(line + Environment.NewLine);
             }
         }
+
 
         private void LoadDevice()
         {
@@ -147,11 +184,23 @@ namespace WindowsFormsApp1
 
         private void btn_search_click(object sender, EventArgs e)
         {
-            string keyword = txtSearch.Text.Trim();
-            var filtered = ticketController.SearchTickets(keyword);
+            currentSearchKeyword = txtSearch.Text.Trim();
 
-            listview_all_ticket.Items.Clear();
-            listview_all_ticket.Items.AddRange(filtered.Select(t => t.ToListViewItem()).ToArray());
+            RefreshTickets(currentSearchKeyword);
+        }
+
+        private void Listview_all_ticket_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            if (e.Column == sortColumn)
+                ascending = !ascending; // click cùng cột → đổi chiều
+            else
+            {
+                sortColumn = e.Column;
+                ascending = true;
+            }
+
+            listview_all_ticket.ListViewItemSorter = new ListViewTicketComparer(e.Column, ascending, ticketController.columnMap);
+            listview_all_ticket.Sort();
         }
 
         private void Listview_all_ticket_DoubleClick(object sender, MouseEventArgs e)
@@ -164,7 +213,7 @@ namespace WindowsFormsApp1
 
             int colIndex = item.SubItems.IndexOf(subItem);
             string oldValue = subItem.Text;
-            string ticketId = item.SubItems[0].Text; 
+            string ticketId = item.SubItems[0].Text;
             string newValue = null;
             string newValueStatus = null;
             string fieldName = null;
@@ -173,9 +222,9 @@ namespace WindowsFormsApp1
             // Map column → field trong DB
             switch (colIndex)
             {
-                case 0: 
-                case 1: 
-                case 2: 
+                case 0:
+                case 1:
+                case 2:
                 case 3:
                 case 7:
                 case 9:
@@ -243,7 +292,7 @@ namespace WindowsFormsApp1
                 case 11: // Admin xác nhận
                     fieldName = "AdminConfirm";
                     using (var form = new ComboBoxForm("Xác nhận của admin",
-                        new List<string> { "Chưa xác nhận","Thay thế sửa chữa", "Không thể sửa chữa", "Đổi mới" }, oldValue))
+                        new List<string> { "Chưa xác nhận", "Thay thế sửa chữa", "Không thể sửa chữa", "Đổi mới" }, oldValue))
                     {
                         if (form.ShowDialog() == DialogResult.OK)
                             newValue = form.SelectedValue;
@@ -295,9 +344,9 @@ namespace WindowsFormsApp1
                 case 13: // User xác nhận
                     fieldName = "UserConfirm";
 
-                     statusText = item.SubItems[4].Text;
-                     statusDtosUser = statusController.GetStatus();
-                     matchedStatus = statusDtosUser.FirstOrDefault(s => s.StatusName == statusText);
+                    statusText = item.SubItems[4].Text;
+                    statusDtosUser = statusController.GetStatus();
+                    matchedStatus = statusDtosUser.FirstOrDefault(s => s.StatusName == statusText);
 
                     if (matchedStatus != null && (matchedStatus.StatusID == "3" || matchedStatus.StatusID == "4"))
                     {
@@ -305,7 +354,7 @@ namespace WindowsFormsApp1
                             new List<string> { "Đang chờ xác nhận", "Hoàn thành", "Chưa hoàn thành" }, oldValue))
                         {
                             if (form.ShowDialog() == DialogResult.OK)
-                            {   
+                            {
                                 newValue = form.SelectedValue;
                                 subItem.Text = newValue;
                                 ticketController.ConfirmUserTicket(ticketId, newValue);
@@ -347,29 +396,29 @@ namespace WindowsFormsApp1
                     ticketController.ConfirmUserTicket(ticketId, newValue);
                     item.SubItems[8].Text = DateTime.Now.ToString("yyyy-MM-dd");
                 }
-                if(fieldName == "TempDevice")
+                if (fieldName == "TempDevice")
                 {
                     subItem.Text = newValue;
-                    ticketController.ConfirmDeviceTempTicket(ticketId, newValue,newValueTempDevice);
+                    ticketController.ConfirmDeviceTempTicket(ticketId, newValue, newValueTempDevice);
                 }
                 else
                 {
                     subItem.Text = fieldName == "StatusID" ? newValueStatus : newValue;
                     ticketController.UpdateTicketField(ticketId, fieldName, newValue);
                 }
-                 var history = new HistoryDto
+                var history = new HistoryDto
                 {
                     HistoryID = Guid.NewGuid().ToString(),
                     TicketID = ticketId,
                     ChangeDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
-                    ChangedBy = "Admin", 
+                    ChangedBy = "Admin",
                     FieldChanged = fieldName,
                     OldValue = oldValue,
                     NewValue = subItem.Text
                 };
                 historyController.AddHistory(history);
 
-                RefreshTickets();
+                RefreshTickets(currentSearchKeyword);
                 LoadHistory();
             }
         }
@@ -462,7 +511,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void btn_Accept_Click(object sender, EventArgs e)
+        private void btn_Delete_Click(object sender, EventArgs e)
         {
             if (listview_all_ticket.SelectedItems.Count == 0)
             {
@@ -474,7 +523,7 @@ namespace WindowsFormsApp1
             }
 
             var selectedItem = listview_all_ticket.SelectedItems[0];
-            string ticketId = selectedItem.SubItems[0].Text; 
+            string ticketId = selectedItem.SubItems[0].Text;
 
             var confirm = MessageBox.Show($"Bạn có chắc chắn muốn xóa ticket {ticketId}?",
                                           "Xác nhận xóa",
@@ -520,5 +569,57 @@ namespace WindowsFormsApp1
         {
             this.Close();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            using (CreateTicketForm nextForm = new CreateTicketForm())
+            {
+                var result = nextForm.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    RefreshTickets();
+                }
+            }
+        }
+
+    } 
+
+
+
+public class ListViewTicketComparer : IComparer
+    {
+        private int col;
+        private bool ascending;
+        private Dictionary<string, string> columnMap;
+
+        public ListViewTicketComparer(int column, bool ascending, Dictionary<string, string> columnMap)
+        {
+            col = column;
+            this.ascending = ascending;
+            this.columnMap = columnMap;
+        }
+
+        public int Compare(object x, object y)
+        {
+            var itemX = (ListViewItem)x;
+            var itemY = (ListViewItem)y;
+
+            string a = itemX.SubItems[col].Text;
+            string b = itemY.SubItems[col].Text;
+
+            // Nếu là số
+            if (decimal.TryParse(a, out var numA) && decimal.TryParse(b, out var numB))
+                return ascending ? numA.CompareTo(numB) : numB.CompareTo(numA);
+
+            // Nếu là ngày
+            if (DateTime.TryParse(a, out var dateA) && DateTime.TryParse(b, out var dateB))
+                return ascending ? dateA.CompareTo(dateB) : dateB.CompareTo(dateA);
+
+            // Mặc định so sánh chuỗi
+            return ascending ? string.Compare(a, b) : string.Compare(b, a);
+        }
     }
 }
+
+
