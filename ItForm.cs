@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Controller;
 using WindowsFormsApp1.Controllers;
+using WindowsFormsApp1.Dtos;
 
 namespace WindowsFormsApp1
 {
@@ -19,12 +20,14 @@ namespace WindowsFormsApp1
         private UserController userController;
         private DeviceController deviceController;
         private StatusController statusController;
+        private HistoryController historyController = new HistoryController();
         public ItForm(string employeeId)
         {
             ticketController = new TicketController();
             userController = new UserController();
             deviceController = new DeviceController();
             statusController = new StatusController();
+            historyController = new HistoryController();
             this.employeeId = employeeId;
             this.Load += ITForm_Load;
             InitializeComponent();
@@ -182,6 +185,18 @@ namespace WindowsFormsApp1
             {
                 subItem.Text = fieldName == "StatusID" ? newValueStatus : newValue;
                 ticketController.UpdateTicketField(ticketId, fieldName, newValue);
+
+                var history = new HistoryDto
+                {
+                    HistoryID = Guid.NewGuid().ToString(),
+                    TicketID = ticketId,
+                    ChangeDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                    ChangedBy = "IT " + employeeId,
+                    FieldChanged = fieldName,
+                    OldValue = oldValue,
+                    NewValue = subItem.Text
+                };
+                historyController.AddHistory(history);
             }
         }
 

@@ -17,25 +17,28 @@ namespace WindowsFormsApp1.Repositories
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string sql = @"
-            SELECT t.TicketID,
-                   t.EmployeeID,
-                   t.DeviceCode,
-                   ts.StatusName,
-                   t.Description,
-                   dt.DeviceTypeName,
-                   dt.DeviceTypeID,
-                   t.AssignedIT,
-                   t.CreatedAt,
-                   t.ClosedAt,
-                   t.ITNote,
-                   t.RepairDetail,
-                   t.AdminConfirm,
-                   t.TempDevice,
-                   t.UserConfirm,
-                   t.DeviceTempID
-            FROM  Tickets t LEFT JOIN TicketStatus ts ON t.StatusID = ts.StatusID LEFT JOIN Devices d ON t.DeviceCode = d.DeviceCode
- LEFT JOIN DeviceTypes dt ON d.DeviceTypeID = dt.DeviceTypeID";
+                string sql = @"SELECT t.TicketID,
+       t.EmployeeID,
+       t.DeviceCode,
+       ts.StatusName,
+       t.Description,
+       dt.DeviceTypeName,
+       dt.DeviceTypeID,
+       t.AssignedIT,
+       t.CreatedAt,
+       t.ClosedAt,
+       t.ITNote,
+       t.RepairDetail,
+       t.AdminConfirm,
+       t.TempDevice,
+       t.UserConfirm,
+       t.DeviceTempID
+FROM Tickets t
+LEFT JOIN TicketStatus ts ON t.StatusID = ts.StatusID
+LEFT JOIN Devices d ON t.DeviceCode = d.DeviceCode
+LEFT JOIN DeviceTypes dt ON d.DeviceTypeID = dt.DeviceTypeID
+WHERE t.IsDeleted = 0;
+";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
 
@@ -77,13 +80,15 @@ namespace WindowsFormsApp1.Repositories
 
 
         // Thêm ticket mới
-        public string AddTicket(TicketDto ticket)
+        public string AddTicket(TicketDto ticket, out string newTicketId)
         {
+            newTicketId = null;
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
 
-                // 1. Check EmployeeID + DeviceCode có tồn tại trong UserDevices không
+                // 1. Check EmployeeID + DeviceCode có tồn tại không
                 string checkSql = @"SELECT COUNT(*) 
                             FROM UserDevices 
                             WHERE EmployeeID = @EmployeeID AND DeviceCode = @DeviceCode";
@@ -102,9 +107,11 @@ namespace WindowsFormsApp1.Repositories
 
                 // 2. Check thiết bị đã có ticket chưa xử lý chưa
                 string checkTicketSql = @"SELECT COUNT(*) 
-                          FROM Tickets 
-                          WHERE DeviceCode = @DeviceCode 
-                            AND StatusID NOT IN (3, 4)";
+                                  FROM Tickets 
+                                  WHERE DeviceCode = @DeviceCode 
+                                  AND StatusID NOT IN (3, 4)     
+                                  AND IsDeleted = 0";
+;
 
                 using (SqlCommand checkTicketCmd = new SqlCommand(checkTicketSql, conn))
                 {
@@ -117,10 +124,11 @@ namespace WindowsFormsApp1.Repositories
                     }
                 }
 
-                // 3. Insert ticket nếu hợp lệ
+                // 3. Insert ticket và lấy TicketID
                 string sql = @"INSERT INTO Tickets 
                        (EmployeeID, DeviceCode, StatusID, Description)
-                       VALUES (@EmployeeID, @DeviceCode, 1, @Description)";
+                       VALUES (@EmployeeID, @DeviceCode, 1, @Description);
+                       SELECT SCOPE_IDENTITY();";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
@@ -128,7 +136,8 @@ namespace WindowsFormsApp1.Repositories
                     cmd.Parameters.AddWithValue("@DeviceCode", ticket.DeviceCode);
                     cmd.Parameters.AddWithValue("@Description", ticket.Description);
 
-                    cmd.ExecuteNonQuery();
+                    object result = cmd.ExecuteScalar();
+                    newTicketId = result.ToString();
                 }
 
                 return "success";
@@ -195,52 +204,61 @@ namespace WindowsFormsApp1.Repositories
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string sql = "DELETE FROM Tickets WHERE TicketID = @TicketID";
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@TicketID", ticketId);
+                string sql = @"UPDATE Tickets 
+                       SET IsDeleted = 1
+                       WHERE TicketID = @TicketID";
 
-                conn.Open();
-                cmd.ExecuteNonQuery();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@TicketID", ticketId);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
+
         public List<TicketDto> SearchTickets(string keyword)
         {
             List<TicketDto> tickets = new List<TicketDto>();
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string sql = @"
-        SELECT t.TicketID,
-               t.EmployeeID,
-               t.DeviceCode,
-               ts.StatusName,
-               t.Description,
-               dt.DeviceTypeName,
-               dt.DeviceTypeID,
-               t.AssignedIT,
-               t.CreatedAt,
-               t.ClosedAt,
-               t.ITNote,
-               t.RepairDetail,
-               t.AdminConfirm,
-               t.TempDevice,
-               t.UserConfirm,
-               t.DeviceTempID
-        FROM Tickets t
-        LEFT JOIN TicketStatus ts ON t.StatusID = ts.StatusID
-        LEFT JOIN Devices d ON t.DeviceCode = d.DeviceCode
-        LEFT JOIN DeviceTypes dt ON d.DeviceTypeID = dt.DeviceTypeID
-        WHERE t.TicketID LIKE @kw
-           OR t.EmployeeID LIKE @kw
-           OR t.DeviceCode LIKE @kw
-           OR ts.StatusName LIKE @kw
-           OR t.Description LIKE @kw
-           OR t.AssignedIT LIKE @kw
-           OR t.AdminConfirm LIKE @kw
-           OR t.UserConfirm LIKE @kw
-           OR dt.DeviceTypeName LIKE @kw
-           OR t.DeviceTempID LIKE @kw
-           OR dt.DeviceTypeID LIKE @kw";
+                string sql = @"SELECT t.TicketID,
+       t.EmployeeID,
+       t.DeviceCode,
+       ts.StatusName,
+       t.Description,
+       dt.DeviceTypeName,
+       dt.DeviceTypeID,
+       t.AssignedIT,
+       t.CreatedAt,
+       t.ClosedAt,
+       t.ITNote,
+       t.RepairDetail,
+       t.AdminConfirm,
+       t.TempDevice,
+       t.UserConfirm,
+       t.DeviceTempID
+FROM Tickets t
+LEFT JOIN TicketStatus ts ON t.StatusID = ts.StatusID
+LEFT JOIN Devices d ON t.DeviceCode = d.DeviceCode
+LEFT JOIN DeviceTypes dt ON d.DeviceTypeID = dt.DeviceTypeID
+WHERE (
+           t.TicketID LIKE @kw
+        OR t.EmployeeID LIKE @kw
+        OR t.DeviceCode LIKE @kw
+        OR ts.StatusName LIKE @kw
+        OR t.Description LIKE @kw
+        OR t.AssignedIT LIKE @kw
+        OR t.AdminConfirm LIKE @kw
+        OR t.UserConfirm LIKE @kw
+        OR dt.DeviceTypeName LIKE @kw
+        OR t.DeviceTempID LIKE @kw
+        OR dt.DeviceTypeID LIKE @kw
+      )
+  AND t.IsDeleted = 0;
+";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@kw", "%" + keyword + "%");
@@ -297,6 +315,7 @@ namespace WindowsFormsApp1.Repositories
                             t.ITNote,
                             t.RepairDetail,
                             t.AdminConfirm,
+                            t.DeviceTempID,
                             t.TempDevice,
                             t.UserConfirm
                             FROM  Tickets t LEFT JOIN TicketStatus ts ON t.StatusID = ts.StatusID 
@@ -320,7 +339,7 @@ namespace WindowsFormsApp1.Repositories
                         ITNote = reader["ITNote"].ToString(),
                         RepairDetail = reader["RepairDetail"].ToString(),
                         AdminConfirm = reader["AdminConfirm"].ToString(),
-                        TempDevice = reader["TempDevice"].ToString(),
+                        TempDevice = reader["TempDevice"].ToString() + "   " + reader["DeviceTempID"].ToString(),
                         UserConfirm = reader["UserConfirm"].ToString()
                     });
                 }

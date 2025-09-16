@@ -10,12 +10,14 @@ using System.Windows.Forms;
 using WindowsFormsApp1.Controller;
 using WindowsFormsApp1.Controllers;
 using WindowsFormsApp1.Dtos;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace WindowsFormsApp1
 {
     public partial class Login : Form
     {
         private TicketController ticketController;
+        private HistoryController historyController = new HistoryController();
         public Login()
         {
             ticketController = new TicketController();
@@ -106,8 +108,8 @@ namespace WindowsFormsApp1
                 DeviceCode = deviceCode,
                 Description = txt_decristion.Text.Trim()
             };
-
-            string result = ticketController.AddTicket(ticket);
+            string newTicketId;
+            string result = ticketController.AddTicket(ticket , out newTicketId);
 
             if (result == "success")
             {
@@ -117,6 +119,19 @@ namespace WindowsFormsApp1
 
                 MessageBox.Show("Tạo ticket thành công!", "Thông báo",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    var history = new HistoryDto
+                    {
+                        HistoryID = Guid.NewGuid().ToString(),
+                        TicketID = newTicketId,
+                        ChangeDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                        ChangedBy = "Người dùng",
+                        FieldChanged = "",
+                        OldValue = "",
+                        NewValue = "",
+                        IsCreator = true
+                    };
+
+                    historyController.AddHistory(history);
             }
             else
             {

@@ -8,6 +8,7 @@ using WindowsFormsApp1.Controller;
 using WindowsFormsApp1.Controllers;
 using WindowsFormsApp1.Dtos;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace WindowsFormsApp1
 {
@@ -17,6 +18,7 @@ namespace WindowsFormsApp1
         private UserController userController;
         private DeviceController deviceController;
         private StatusController statusController;
+        private HistoryController historyController;
 
         public AdminForm()
         {
@@ -26,6 +28,7 @@ namespace WindowsFormsApp1
             userController = new UserController();
             deviceController = new DeviceController();
             statusController = new StatusController();
+            historyController = new HistoryController();
         }
 
         private void AdminForm_Load(object sender, EventArgs e)
@@ -48,6 +51,7 @@ namespace WindowsFormsApp1
             listview_all_ticket.Columns.Add("Xác nhận người dùng", 100);
             listview_all_ticket.Columns.Add("DeviceTypeID", 55);
             listview_all_ticket.Columns.Add("DeviceTempID", 55);
+            listview_all_ticket.Columns.Add("DeleteTicket", 0);
 
             listview_all_ticket.FullRowSelect = true;
             listview_all_ticket.GridLines = true;
@@ -89,6 +93,7 @@ namespace WindowsFormsApp1
             RefreshTickets();
             LoadUsers();
             LoadDevice();
+            LoadHistory();
         }
 
         private void RefreshTickets()
@@ -109,6 +114,22 @@ namespace WindowsFormsApp1
                 users.Select(u => u.ToListViewUser()).ToArray()
             );
         }
+
+        private void LoadHistory()
+        {
+            var historyList = historyController.GetAllHistory();
+            rtb_history.Clear();
+            foreach (var h in historyList)
+            {
+                string line = $"[{h.ChangeDate}] {h.ChangedBy} thay đổi \"{h.FieldChanged}\" từ \"{h.OldValue}\" → \"{h.NewValue}\"";
+                if (h.IsCreator)
+                {
+                    line = $"[{h.ChangeDate}] {h.ChangedBy} tạo ticket mới";
+                }
+                rtb_history.AppendText(line + Environment.NewLine);
+            }
+        }
+
         private void LoadDevice()
         {
             listview_device.Items.Clear();
@@ -143,7 +164,7 @@ namespace WindowsFormsApp1
 
             int colIndex = item.SubItems.IndexOf(subItem);
             string oldValue = subItem.Text;
-            string ticketId = item.SubItems[0].Text; // cột 0 = TicketID
+            string ticketId = item.SubItems[0].Text; 
             string newValue = null;
             string newValueStatus = null;
             string fieldName = null;
@@ -164,17 +185,6 @@ namespace WindowsFormsApp1
                     break;
                 case 4: // Status
                     fieldName = "StatusID";
-
-                    // nếu ticket đã xong thì không cho đổi trạng thái
-                    //if (oldValue == "Đã xong" || oldValue == "Đã hủy")
-                    //{
-                    //    MessageBox.Show("Ticket này đã hoàn thành, không thể thay đổi trạng thái.",
-                    //                    "Thông báo",
-                    //                    MessageBoxButtons.OK,
-                    //                    MessageBoxIcon.Warning);
-                    //    return;
-                    //}
-
                     var statusDtos = statusController.GetStatus();
                     var statusNames = statusDtos.Select(s => s.StatusName).ToList();
 
@@ -347,7 +357,20 @@ namespace WindowsFormsApp1
                     subItem.Text = fieldName == "StatusID" ? newValueStatus : newValue;
                     ticketController.UpdateTicketField(ticketId, fieldName, newValue);
                 }
+                 var history = new HistoryDto
+                {
+                    HistoryID = Guid.NewGuid().ToString(),
+                    TicketID = ticketId,
+                    ChangeDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                    ChangedBy = "Admin", 
+                    FieldChanged = fieldName,
+                    OldValue = oldValue,
+                    NewValue = subItem.Text
+                };
+                historyController.AddHistory(history);
+
                 RefreshTickets();
+                LoadHistory();
             }
         }
 
@@ -377,8 +400,8 @@ namespace WindowsFormsApp1
                 DeviceCode = deviceCode,
                 Description = txt_decristion.Text.Trim()
             };
-
-            string result = ticketController.AddTicket(ticket);
+            string newTicketId;
+            string result = ticketController.AddTicket(ticket, out newTicketId);
 
             if (result == "success")
             {
@@ -439,5 +462,63 @@ namespace WindowsFormsApp1
             }
         }
 
+        private void btn_Accept_Click(object sender, EventArgs e)
+        {
+            if (listview_all_ticket.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Vui lòng chọn một ticket để xóa.",
+                                "Thông báo",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                return;
+            }
+
+            var selectedItem = listview_all_ticket.SelectedItems[0];
+            string ticketId = selectedItem.SubItems[0].Text; 
+
+            var confirm = MessageBox.Show($"Bạn có chắc chắn muốn xóa ticket {ticketId}?",
+                                          "Xác nhận xóa",
+                                          MessageBoxButtons.YesNo,
+                                          MessageBoxIcon.Question);
+            if (confirm == DialogResult.Yes)
+            {
+                try
+                {
+                    ticketController.DeleteTicket(ticketId);
+                    MessageBox.Show("Xóa ticket thành công!",
+                                    "Thông báo",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                    var history = new HistoryDto
+                    {
+                        HistoryID = Guid.NewGuid().ToString(),
+                        TicketID = ticketId,
+                        ChangeDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                        ChangedBy = "Admin",
+                        FieldChanged = "IsDeleted",
+                        OldValue = "0",
+                        NewValue = "1"
+                    };
+                    historyController.AddHistory(history);
+
+                    RefreshTickets();
+                    LoadHistory();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi khi xóa ticket: " + ex.Message,
+                                    "Lỗi",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                }
+            }
+
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

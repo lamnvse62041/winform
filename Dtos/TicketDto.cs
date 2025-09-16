@@ -26,6 +26,8 @@ namespace WindowsFormsApp1.Dtos
 
         public string DeviceTempID { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         // Hàm convert sang ListViewItem để dễ add vào listview
         public ListViewItem ToListViewItem()
         {
@@ -46,7 +48,8 @@ namespace WindowsFormsApp1.Dtos
                 TempDevice,
                 UserConfirm,
                 DeviceTypeID,
-                DeviceTempID
+                DeviceTempID,
+                IsDeleted.ToString()
             });
         }
 

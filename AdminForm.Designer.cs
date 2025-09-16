@@ -43,7 +43,6 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.label5 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            //this.cb_type_device = new System.Windows.Forms.ComboBox();
             this.btnCreate = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -54,6 +53,8 @@
             this.txt_employee_code = new System.Windows.Forms.TextBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.listview_device = new System.Windows.Forms.ListView();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.rtb_history = new System.Windows.Forms.RichTextBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tab_controller.SuspendLayout();
@@ -61,6 +62,7 @@
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tabPage4.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tab_controller
@@ -69,6 +71,7 @@
             this.tab_controller.Controls.Add(this.tabPage2);
             this.tab_controller.Controls.Add(this.tabPage3);
             this.tab_controller.Controls.Add(this.tabPage4);
+            this.tab_controller.Controls.Add(this.tabPage5);
             this.tab_controller.Location = new System.Drawing.Point(12, 12);
             this.tab_controller.Name = "tab_controller";
             this.tab_controller.SelectedIndex = 0;
@@ -116,6 +119,7 @@
             this.btnCancel.TabIndex = 2;
             this.btnCancel.Text = "Hủy";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btn_Accept
             // 
@@ -123,8 +127,9 @@
             this.btn_Accept.Name = "btn_Accept";
             this.btn_Accept.Size = new System.Drawing.Size(105, 23);
             this.btn_Accept.TabIndex = 1;
-            this.btn_Accept.Text = "Đồng ý";
+            this.btn_Accept.Text = "Xóa ticket";
             this.btn_Accept.UseVisualStyleBackColor = true;
+            this.btn_Accept.Click += new System.EventHandler(this.btn_Accept_Click);
             // 
             // listview_all_ticket
             // 
@@ -179,7 +184,6 @@
             // 
             this.tabPage3.Controls.Add(this.label5);
             this.tabPage3.Controls.Add(this.label2);
-            //this.tabPage3.Controls.Add(this.cb_type_device);
             this.tabPage3.Controls.Add(this.btnCreate);
             this.tabPage3.Controls.Add(this.label4);
             this.tabPage3.Controls.Add(this.label3);
@@ -215,13 +219,6 @@
             this.label2.Size = new System.Drawing.Size(17, 13);
             this.label2.TabIndex = 11;
             this.label2.Text = "(*)";
-            // 
-            // cb_type_device
-            //// 
-            //this.cb_type_device.Location = new System.Drawing.Point(0, 0);
-            //this.cb_type_device.Name = "cb_type_device";
-            //this.cb_type_device.Size = new System.Drawing.Size(121, 21);
-            //this.cb_type_device.TabIndex = 13;
             // 
             // btnCreate
             // 
@@ -310,6 +307,28 @@
             this.listview_device.TabIndex = 0;
             this.listview_device.UseCompatibleStateImageBehavior = false;
             // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.rtb_history);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Size = new System.Drawing.Size(768, 360);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "Lịch sử thay đổi";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // rtb_history
+            // 
+            this.rtb_history.BackColor = System.Drawing.Color.White;
+            this.rtb_history.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rtb_history.Font = new System.Drawing.Font("Consolas", 10F);
+            this.rtb_history.Location = new System.Drawing.Point(0, 0);
+            this.rtb_history.Name = "rtb_history";
+            this.rtb_history.ReadOnly = true;
+            this.rtb_history.Size = new System.Drawing.Size(768, 360);
+            this.rtb_history.TabIndex = 0;
+            this.rtb_history.Text = "";
+            // 
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Name = "contextMenuStrip1";
@@ -335,6 +354,7 @@
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.tabPage4.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -345,6 +365,7 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2; 
         private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btn_Accept;
         private System.Windows.Forms.ListView listview_all_ticket;
@@ -368,5 +389,7 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.RichTextBox rtb_history;
+
     }
 }
