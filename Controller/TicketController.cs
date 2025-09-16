@@ -18,9 +18,9 @@ namespace WindowsFormsApp1.Controllers
             return ticketRepo.GetAllTickets();
         }
 
-        public string AddTicket(TicketDto ticket)
+        public string AddTicket(TicketDto ticket , out string newTicketId)
         {
-            return  ticketRepo.AddTicket(ticket);
+            return  ticketRepo.AddTicket(ticket, out newTicketId);
         }
 
         public void UpdateTicketField(string ticketId, string fieldName, string newValue,bool ? isUpdate = false)

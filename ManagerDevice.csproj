@@ -88,10 +88,12 @@
     </Compile>
     <Compile Include="AppConfig\AppConfig.cs" />
     <Compile Include="Controller\DeviceController.cs" />
+    <Compile Include="Controller\HistoryController.cs" />
     <Compile Include="Controller\StatusController.cs" />
     <Compile Include="Controller\TicketController.cs" />
     <Compile Include="Controller\UserController.cs" />
     <Compile Include="DataAccess\DeviceRepository.cs" />
+    <Compile Include="DataAccess\HistoryRepository.cs" />
     <Compile Include="DataAccess\SqlConnector.cs" />
     <Compile Include="DataAccess\StatusRepository.cs" />
     <Compile Include="DataAccess\TicketRepository.cs" />
@@ -103,6 +105,7 @@
       <DependentUpon>DatePickerFormDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dtos\DeviceDto.cs" />
+    <Compile Include="Dtos\HistoryDto.cs" />
     <Compile Include="Dtos\TicketDto.cs" />
     <Compile Include="Dtos\UserDto.cs" />
     <Compile Include="EmployeeForm.cs">
