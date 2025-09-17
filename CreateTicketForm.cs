@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Controller;
 using WindowsFormsApp1.Controllers;
 using WindowsFormsApp1.Dtos;
 
@@ -17,6 +18,7 @@ namespace WindowsFormsApp1
         
     {
         TicketController ticketController = new TicketController();
+        HistoryController historyController = new HistoryController();
         public CreateTicketForm()
         {
             InitializeComponent();
@@ -99,7 +101,19 @@ namespace WindowsFormsApp1
                 txt_employee_code.Clear();
                 txt_device_code.Clear();
                 txt_decristion.Clear();
+                var history = new HistoryDto
+                {
+                    HistoryID = Guid.NewGuid().ToString(),
+                    TicketID = newTicketId,
+                    ChangeDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                    ChangedBy = "Admin",
+                    FieldChanged = "",
+                    OldValue = "",
+                    NewValue = "",
+                    IsCreator = true
+                };
 
+                historyController.AddHistory(history);
                 MessageBox.Show("Tạo ticket thành công!", "Thông báo",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.DialogResult = DialogResult.OK;
