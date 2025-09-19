@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using WindowsFormsApp1.Constant;
 
 namespace ManagerDevice.DataAccess
 {
     public class SqlConnector
     {
         // Chuỗi kết nối SQL Server
-        private string connectionString = @"Server=LOCALHOST\SQLEXPRESS01;Database=DeviceIT;Trusted_Connection=True;";
+        //private string connectionString = @"Server=LOCALHOST\SQLEXPRESS01;Database=DeviceIT;Trusted_Connection=True;";
 
         // Mở kết nối
         public SqlConnection GetConnection()
         {
-            SqlConnection conn = new SqlConnection(connectionString);
+            SqlConnection conn = new SqlConnection(AppConfig.connectionString);
             return conn;
         }
 

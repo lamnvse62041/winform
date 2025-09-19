@@ -8,7 +8,7 @@ namespace WindowsFormsApp1.Repositories
 {
     public class TicketRepository
     {
-        private string connectionString = @"Server=LOCALHOST\SQLEXPRESS01;Database=DeviceIT;Trusted_Connection=True;";
+        private string connectionString = AppConfig.connectionString;
 
         // Lấy tất cả tickets
         public List<TicketDto> GetAllTickets()

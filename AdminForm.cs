@@ -128,15 +128,25 @@ namespace WindowsFormsApp1
         private void LoadHistory()
         {
             var historyList = historyController.GetAllHistory();
-
-            // Sort giảm dần theo ChangeDate
+            var fieldLabels = new Dictionary<string, string>
+            {
+                { "StatusID", "Trạng thái" },
+                { "AssignedIT", "IT sửa chữa" },
+                { "ClosedAt", "Ngày đóng" },
+                { "Description", "Miêu tả bởi người dùng" },
+                { "ITDescription", "Mô tả bởi IT" },
+                { "RepairDetails", "Chi tiết sửa chữa" },
+                { "AdminConfirm", "Admin xác nhận" },
+                { "TempDevice", "Thiết bị cấp tạm thời" },
+                { "UserConfirm", "Xác nhận người dùng" },
+                { "IsDeleted", "Xóa ticket" }
+            };
             historyList = historyList
                 .OrderByDescending(h => DateTime.TryParse(h.ChangeDate, out DateTime dt) ? dt : DateTime.MinValue)
                 .ToList();
 
             rtb_history.Clear();
 
-            // Nhóm theo ngày
             var grouped = historyList.GroupBy(h =>
                 DateTime.TryParse(h.ChangeDate, out DateTime dt) ? dt.Date : DateTime.MinValue.Date
             );
@@ -149,23 +159,24 @@ namespace WindowsFormsApp1
                 foreach (var h in group)
                 {
                     DateTime dt = DateTime.TryParse(h.ChangeDate, out DateTime t) ? t : DateTime.MinValue;
-                    string timePart = dt.ToString("dd/MM/yyyy HH:mm");
-                    string line;
+                    string timePart = dt.ToString("HH:mm");
 
+                    string line;
                     if (h.IsCreator)
                     {
                         line = $"[{timePart}] {h.ChangedBy} tạo ticket mới";
                     }
                     else
                     {
-                        line = $"[{timePart}] {h.ChangedBy} thay đổi \"{h.FieldChanged}\" từ \"{h.OldValue}\" → \"{h.NewValue}\"";
+                        // Dùng label tiếng Việt
+                        string label = fieldLabels.ContainsKey(h.FieldChanged) ? fieldLabels[h.FieldChanged] : h.FieldChanged;
+                        line = $"[{timePart}] {h.ChangedBy} thay đổi \"{label}\" từ \"{h.OldValue}\" → \"{h.NewValue}\"";
                     }
 
                     rtb_history.AppendText("  " + line + Environment.NewLine);
                 }
             }
         }
-
 
         private void LoadDevice()
         {
@@ -551,7 +562,7 @@ namespace WindowsFormsApp1
                     };
                     historyController.AddHistory(history);
 
-                    RefreshTickets();
+                    RefreshTickets(currentSearchKeyword);
                     LoadHistory();
                 }
                 catch (Exception ex)
@@ -579,6 +590,7 @@ namespace WindowsFormsApp1
                 if (result == DialogResult.OK)
                 {
                     RefreshTickets();
+                    LoadHistory();
                 }
             }
         }

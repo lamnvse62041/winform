@@ -67,6 +67,7 @@ namespace WindowsFormsApp1
             Form nextForm;
             switch (userDto.Role)
             {
+                case "admin":
                 case "Admin":
                     nextForm = new AdminForm();
                     break;

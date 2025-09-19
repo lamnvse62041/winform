@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace WindowsFormsApp1.Dtos
@@ -70,5 +71,16 @@ namespace WindowsFormsApp1.Dtos
                 UserConfirm
             });
         }
+        public Dictionary<string, string> fieldLabels = new Dictionary<string, string>
+{
+    { "Status", "Trạng thái" },
+    { "AssignedIT", "Người xử lý" },
+    { "ITNote", "Ghi chú IT" },
+    { "RepairDetail", "Chi tiết sửa chữa" },
+    { "AdminConfirm", "Xác nhận Admin" },
+    { "TempDevice", "Thiết bị tạm" },
+    { "UserConfirm", "Xác nhận người dùng" }
+};
+
     }
 }
